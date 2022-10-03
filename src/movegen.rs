@@ -116,7 +116,10 @@ impl <
         if !check_mask.has_bits() {
             check_mask = Bitboard(0xFFFFFFFFFFFFFFFF);
         }
+
         todo!();
+
+        return checkmask;
     }
 
 

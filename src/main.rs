@@ -2,6 +2,7 @@
 
 #![allow(dead_code)]
 #![allow(unused_imports)]
+#![allow(unreachable_code)]
 
 #![feature(const_eval_limit)]
 #![const_eval_limit = "0"]
@@ -10,9 +11,6 @@ extern crate lazy_static;
 extern crate rand;
 use min_max::TwoPlayerGame;
 
-mod connect4;
-mod checkers;
-mod tree;
 mod min_max;
 mod chess;
 mod movegen;
@@ -24,6 +22,7 @@ fn main() {
     use crate::chess::*;
     use crate::compile_time_constants::*;
     use crate::pext_consts::*;
+    use crate::movegen::*;
 
     // let sq: usize = 27;
     // let pattern = LOOKUP_X_NO_FRAME_NO_CENTER[sq];
@@ -104,11 +103,76 @@ fn main() {
     //     lookup
     // };
 
-
     // let king_sq: usize = 28;
     // for sq in 0..64 {
     //     println!("KingSq: {}, EnemySq: {}", king_sq, sq);
     //     LOOKUP_KING_ENEMY_PATH[king_sq][sq].visualize();
     // }
+
+    // let from: usize = 28;
+    // for to in 0..64 {
+    //     println!("From: {}, To: {}", from, to);
+    //     LOOKUP_PATH_WITHOUT_END[from][to].visualize();
+    // }
+
+    // let board = MoveGenInfo::<false, false, true, true, true, true> {
+    //     w_pawns: Bitboard(0x000000001000EF00),
+    //     b_pawns: Bitboard(0x00F3080400000000),
+    //     w_knights: Bitboard(0x0000000000200002),
+    //     b_knights: Bitboard(0x4200000000000000),
+    //     w_bishops: Bitboard(0x0000000200000004),
+    //     b_bishops: Bitboard(0x2400000000000000),
+    //     w_rooks: Bitboard(0x0000000000000081),
+    //     b_rooks: Bitboard(0x8100000000000000),
+    //     w_queens: Bitboard(0x0000000000000008),
+    //     b_queens: Bitboard(0x0800000000000000),
+    //     w_kings: Bitboard(0x0000000000000010),
+    //     b_kings: Bitboard(0x1000000000000000),
+
+    //     white_mask: Bitboard(0x000000021020EF9F),
+    //     black_mask: Bitboard(0xFFF3080400000000),
+    //     occupied: Bitboard(0xFFF308061020EF9F)
+    // };
+
+    let board = MoveGenInfo::<true, false, false, false, false, false> {
+        w_pawns: Bitboard(0x000000000423A000),
+        b_pawns: Bitboard(0x0063008808000000),
+        w_knights: Bitboard(0x0),
+        b_knights: Bitboard(0x0000004000000000),
+        w_bishops: Bitboard(0x0),
+        b_bishops: Bitboard(0x0000000200000000),
+        w_rooks: Bitboard(0x81),
+        b_rooks: Bitboard(0x8100000000000000),
+        w_queens: Bitboard(0x0),
+        b_queens: Bitboard(0x0),
+        w_kings: Bitboard(0x0000000000100000),
+        b_kings: Bitboard(0x1000000000000000),
+
+        white_mask: Bitboard(0x000000000433A081),
+        black_mask: Bitboard(0x916300CA08000000),
+        occupied: Bitboard(0x916300CA0C33A081)
+    };
+
+    // Bitboard(0x000000000423A000).visualize();
+    // Bitboard(0x0063008808000000).visualize();
+    // Bitboard(0x0000000000000000).visualize();
+    // Bitboard(0x0000004000000000).visualize();
+    // Bitboard(0x0000000000000000).visualize();
+    // Bitboard(0x0000000200000000).visualize();
+    // Bitboard(0x0000000000000081).visualize();
+    // Bitboard(0x8100000000000000).visualize();
+    // Bitboard(0x0000000000000000).visualize();
+    // Bitboard(0x0000000000000000).visualize();
+    // Bitboard(0x0000000000100000).visualize();
+    // Bitboard(0x1000000000000000).visualize();
+
+    // Bitboard(0x000000000433A081).visualize();
+    // Bitboard(0x916300CA08000000).visualize();
+    // Bitboard(0x916300CA0C33A081).visualize();
+
+    let mask = board.get_checkmask();
+    println!("Final:");
+    mask.visualize();
+
 
 }

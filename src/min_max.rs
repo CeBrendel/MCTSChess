@@ -1,9 +1,17 @@
 
-use crate::connect4;
-
 #[derive(Copy, Clone, PartialEq, Eq, Debug)]
 pub enum Player {
     None, Black, White
+}
+
+impl Player {
+    pub fn swap(self) -> Player {
+        match self {
+            Player::None => Player::None,
+            Player::Black => Player::White,
+            Player::White => Player::Black
+        }
+    }
 }
 
 pub trait TwoPlayerGame {

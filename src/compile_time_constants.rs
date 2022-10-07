@@ -1,6 +1,4 @@
 
-use std::collections::btree_map::OccupiedEntry;
-
 use crate::chess::Bitboard;
 
 // toggleable assert
@@ -35,6 +33,11 @@ macro_rules! bitloop {
 pub(crate) use compiletime_toggleable_assert;
 pub(crate) use bitloop;
 
+const fn min(a: usize, b: usize) -> usize {
+    if a > b {b} else {a}
+}
+
+// will change to const later
 pub const WHITE_PAWN_KING_ATTACKS: [Bitboard; 64] = {
 
     let mut pawn_mask: [Bitboard; 64] = [Bitboard(0); 64];
@@ -56,6 +59,7 @@ pub const WHITE_PAWN_KING_ATTACKS: [Bitboard; 64] = {
     pawn_mask
 };
 
+// will change to const later
 pub const BLACK_PAWN_KING_ATTACKS: [Bitboard; 64] = {
 
     let mut pawn_mask: [Bitboard; 64] = [Bitboard(0); 64];
@@ -77,6 +81,7 @@ pub const BLACK_PAWN_KING_ATTACKS: [Bitboard; 64] = {
     pawn_mask
 };
 
+// will change to const later
 pub const KNIGHT_MASK: [Bitboard; 64] = {
 
     let mut knight_masks: [Bitboard; 64] = [Bitboard(0); 64];
@@ -106,6 +111,7 @@ pub const KNIGHT_MASK: [Bitboard; 64] = {
     knight_masks
 };
 
+// will change to const later
 pub const PLUS_MASK: [Bitboard; 64] = {
 
     let mut plus_masks: [Bitboard; 64] = [Bitboard(0); 64];
@@ -132,6 +138,7 @@ pub const PLUS_MASK: [Bitboard; 64] = {
     plus_masks
 };
 
+// will change to const later
 pub const X_MASK: [Bitboard; 64] = {
 
     let mut x_masks: [Bitboard; 64] = [Bitboard(0); 64];
@@ -185,8 +192,68 @@ pub const X_MASK: [Bitboard; 64] = {
     }
     
     x_masks
-}; 
+};
 
+// will change to const later
+pub const LOOKUP_PATH_WITHOUT_END: [[Bitboard; 64]; 64] = {
+    let mut lookup: [[Bitboard; 64]; 64] =  [[Bitboard(0); 64]; 64];
+
+    let mut from_sq: usize = 0;
+    while from_sq < 64 {
+
+        let (x, y) = (from_sq % 8, from_sq / 8);
+
+        // make macro to easy all loops
+        macro_rules! arm_loop {
+            ( $back_cond:expr, $rem_its:expr, $sub:expr, $step:expr ) => {
+                let mut path: u64 = 1 << from_sq;
+                let mut to_sq: usize = from_sq;
+                let mut remaining_its: usize = $rem_its;
+                while remaining_its > 0 {
+
+                    if $sub {
+                        to_sq -= $step
+                    } else {
+                        to_sq += $step;
+                    }
+                    
+                    lookup[from_sq][to_sq] = Bitboard(path);
+                    
+                    path |= 1 << to_sq;
+                    remaining_its -= 1;
+                }
+            };
+        }
+
+        // r arm
+        arm_loop!( x>0 , 7-x, false, 1 );
+
+        // rd arm
+        arm_loop!( x>0&&y<7 , min(7-x, y) , true , 7 );
+
+        // d arm
+        arm_loop!( y<7 , y , true, 8 );
+
+        // ld
+        arm_loop!( x<7&&y<7 , min(x, y) , true , 9);
+
+        // l arm
+        arm_loop!( x<7 , x , true , 1 );
+
+        // lu arm
+        arm_loop!( x<7&&y>0 , min(x, 7-y) , false , 7);
+
+        // u arm
+        arm_loop!( y>0 , 7-y , false , 8);
+
+        // ru arm
+        arm_loop!( x>0&&y>0 , min(7-x, 7-y) , false , 9);
+
+        from_sq += 1;
+    }
+
+    lookup
+};
 
 // // the x_ray mask for each pair of (king square, slider square, slider type)
 // const X_RAY_MASK: [[[Bitboard; 64]; 64]; 1+1+1] = {

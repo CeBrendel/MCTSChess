@@ -1,5 +1,5 @@
 use core::convert::TryInto;
-use std::{ops::BitAnd, borrow::BorrowMut};
+use std::{ops::{BitAnd, BitOrAssign, BitOr, Shr, Shl}, borrow::BorrowMut};
 use crate::min_max::{TwoPlayerGame, Player};
 use lazy_static::lazy_static;
 
@@ -122,7 +122,7 @@ impl Action {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Bitboard(pub u64);
 
 impl Bitboard {
@@ -206,10 +206,15 @@ impl Bitboard {
     }
 
     #[inline(always)]
-    pub fn unsafe_pext(self, mask: Bitboard) -> usize {
+    fn unsafe_pext(self, mask: Bitboard) -> usize {
         unsafe {
             core::arch::x86_64::_pext_u64(self.0, mask.0) as usize
         }
+    }
+
+    #[inline(always)]
+    pub fn pext(self, mask: Bitboard) -> usize {
+        self.unsafe_pext(mask)
     }
 
     pub fn visualize(&self) -> () {
@@ -228,7 +233,7 @@ impl Bitboard {
 
 }
 
-impl std::ops::BitAnd for Bitboard {
+impl BitAnd for Bitboard {
     type Output = Bitboard;
 
     fn bitand(self, rhs: Bitboard) -> Self::Output {
@@ -236,11 +241,33 @@ impl std::ops::BitAnd for Bitboard {
     }
 }
 
-impl std::ops::BitOr for Bitboard {
+impl BitOr for Bitboard {
     type Output = Bitboard;
 
     fn bitor(self, rhs: Bitboard) -> Self::Output {
         Bitboard(self.0 | rhs.0)
+    }
+}
+
+impl BitOrAssign for Bitboard {
+    fn bitor_assign(&mut self, rhs: Self) {
+        self.0 |= rhs.0;
+    }
+}
+
+impl Shr<usize> for Bitboard {
+    type Output = Self;
+
+    fn shr(self, rhs: usize) -> Self::Output {
+        Bitboard(self.0 >> rhs)
+    }
+}
+
+impl Shl<usize> for Bitboard {
+    type Output = Self;
+
+    fn shl(self, rhs: usize) -> Self::Output {
+        Bitboard(self.0 << rhs)
     }
 }
 

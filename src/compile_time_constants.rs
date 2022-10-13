@@ -2,20 +2,20 @@
 use crate::chess::Bitboard;
 
 // toggleable assert
-pub const USE_RUNTIME_ASSERT: bool = true;
-macro_rules! compiletime_toggleable_assert {
-    ( $( $x:expr ),* ) => {
-        {
-            $(
-                if crate::compile_time_constants::USE_RUNTIME_ASSERT {
-                    if !($x) {
-                        panic!("Assert failed!");
-                    }
-                }
-            )*
-        }
-    };
-}
+// pub const USE_RUNTIME_ASSERT: bool = true;
+// macro_rules! compiletime_toggleable_assert {
+//     ( $( $x:expr ),* ) => {
+//         {
+//             $(
+//                 if crate::compile_time_constants::USE_RUNTIME_ASSERT {
+//                     if !($x) {
+//                         panic!("Assert failed!");
+//                     }
+//                 }
+//             )*
+//         }
+//     };
+// }
 
 macro_rules! bitloop {
     ( $bb:expr , $var:ident => $body:expr ) => {
@@ -30,7 +30,7 @@ macro_rules! bitloop {
     }
 }
 
-pub(crate) use compiletime_toggleable_assert;
+// pub(crate) use compiletime_toggleable_assert;
 pub(crate) use bitloop;
 
 const fn min(a: usize, b: usize) -> usize {
